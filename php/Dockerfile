@@ -2,7 +2,7 @@
 # php 7.0 with fpm enabled
 #
 # extra enabled extensions:
-#   bcmath calendar pdo_mysql zip opcache grpc gd mcrypt
+#   amqp bcmath calendar gd grpc mcrypt pdo_mysql phpiredis opcache zip
 #
 FROM php:7.0-fpm
 
@@ -13,13 +13,16 @@ RUN apt-get update \
         rake \
         ruby-ronn \
         libmemcached-dev \
+        librabbitmq-dev \
+        libhiredis-dev \
         zlib1g-dev \
         libfreetype6-dev \
         libjpeg62-turbo-dev \
         libmcrypt-dev \
         libpng12-dev \
-    && apt-get clean \
-    && docker-php-ext-install -j$(nproc) mcrypt \
+    && apt-get clean
+
+RUN docker-php-ext-install -j$(nproc) mcrypt \
     && docker-php-ext-install -j$(nproc) bcmath \
     && docker-php-ext-install -j$(nproc) calendar \
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
@@ -32,6 +35,19 @@ RUN apt-get update \
     && docker-php-ext-install -j$(nproc) opcache \
 
     && pecl install memcached grpc \
-    && docker-php-ext-enable memcached grpc \
+    && echo "/usr" | pecl install amqp \
+
+    && ( \
+        mkdir /tmp/sources \
+        && cd /tmp/sources \
+        && curl -fsSL https://github.com/nrk/phpiredis/archive/v1.0.zip -o phpiredis.zip \
+        && unzip phpiredis.zip \
+        && cd phpiredis-1.0/ \
+        && phpize && ./configure --enable-phpiredis \
+        && make -j$(nproc) && make install \
+        && rm -rf /tmp/sources \
+    ) \
+
+    && docker-php-ext-enable memcached grpc amqp phpiredis
 
 # vim:ft=dockerfile
