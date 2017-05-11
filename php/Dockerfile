@@ -4,13 +4,7 @@
 # extra enabled extensions:
 #   bcmath calendar pdo_mysql zip opcache grpc gd mcrypt
 #
-# apt mirror: 163
-# composer installed
-#
 FROM php:7.0-fpm
-
-# update apt-get sources, use 163 mirror
-COPY config/sources.list /etc/apt/sources.list
 
 RUN apt-get update \
     && apt-get install -y \
@@ -39,10 +33,5 @@ RUN apt-get update \
 
     && pecl install memcached grpc \
     && docker-php-ext-enable memcached grpc \
-
-    # install composer
-    && wget https://dl.laravel-china.org/composer.phar -O /usr/local/bin/composer \
-    && chmod a+x /usr/local/bin/composer \
-    && composer config -g repo.packagist composer https://packagist.laravel-china.org
 
 # vim:ft=dockerfile
