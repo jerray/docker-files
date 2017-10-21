@@ -8,10 +8,7 @@ FROM php:7.1-fpm
 
 RUN apt-get update \
     && apt-get install -y \
-        git \
-        wget \
-        rake \
-        ruby-ronn \
+        unzip \
         libmemcached-dev \
         librabbitmq-dev \
         libhiredis-dev \
