@@ -1,10 +1,10 @@
 #
-# php 7.0 with fpm enabled
+# php 7.1 with fpm enabled
 #
 # extra enabled extensions:
-#   amqp bcmath calendar gd grpc mcrypt pdo_mysql phpiredis opcache zip
+#   amqp bcmath calendar gd grpc mcrypt pdo_mysql phpiredis protobuf opcache zip
 #
-FROM php:7.0-fpm
+FROM php:7.1-fpm
 
 RUN apt-get update \
     && apt-get install -y \
@@ -20,7 +20,8 @@ RUN apt-get update \
         libjpeg62-turbo-dev \
         libmcrypt-dev \
         libpng12-dev \
-    && apt-get clean
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN docker-php-ext-install -j$(nproc) mcrypt \
     && docker-php-ext-install -j$(nproc) bcmath \
@@ -33,10 +34,8 @@ RUN docker-php-ext-install -j$(nproc) mcrypt \
     && docker-php-ext-install -j$(nproc) zip \
     && docker-php-ext-configure opcache --enable-opcache \
     && docker-php-ext-install -j$(nproc) opcache \
-
-    && pecl install memcached grpc \
+    && pecl install memcached protobuf grpc-1.7.0RC1 \
     && echo "/usr" | pecl install amqp \
-
     && ( \
         mkdir /tmp/sources \
         && cd /tmp/sources \
@@ -47,7 +46,6 @@ RUN docker-php-ext-install -j$(nproc) mcrypt \
         && make -j$(nproc) && make install \
         && rm -rf /tmp/sources \
     ) \
-
-    && docker-php-ext-enable memcached grpc amqp phpiredis
+    && docker-php-ext-enable memcached protobuf grpc amqp phpiredis
 
 # vim:ft=dockerfile
