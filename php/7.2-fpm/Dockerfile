@@ -33,7 +33,7 @@ RUN docker-php-ext-install -j$(nproc) bcmath \
     && docker-php-ext-install -j$(nproc) zip \
     && docker-php-ext-configure opcache --enable-opcache \
     && docker-php-ext-install -j$(nproc) opcache \
-    && pecl install mcrypt-1.0.2 memcached protobuf grpc-1.9.0 \
+    && pecl install mcrypt-1.0.2 memcached protobuf grpc-1.26.0 \
     && echo "/usr" | pecl install amqp \
     && ( \
         mkdir /tmp/sources \
